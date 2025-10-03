@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { FileText } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const RequestForm = () => {
   const [formData, setFormData] = useState({
@@ -18,7 +19,7 @@ const RequestForm = () => {
     budget: ""
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
@@ -27,17 +28,35 @@ const RequestForm = () => {
       return;
     }
     
-    toast.success("Request submitted! We'll contact you soon.");
-    
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      projectType: "",
-      description: "",
-      budget: ""
-    });
+    try {
+      const { error } = await supabase
+        .from("project_requests")
+        .insert({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone || null,
+          project_type: formData.projectType,
+          description: formData.description || null,
+          budget: formData.budget || null
+        });
+
+      if (error) throw error;
+
+      toast.success("Request submitted! We'll contact you soon.");
+      
+      // Reset form
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        projectType: "",
+        description: "",
+        budget: ""
+      });
+    } catch (error) {
+      console.error("Error submitting request:", error);
+      toast.error("Failed to submit request. Please try again.");
+    }
   };
 
   return (
