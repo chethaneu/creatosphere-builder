@@ -36,9 +36,21 @@ interface ContactMessage {
   created_at: string;
 }
 
+interface Referral {
+  id: string;
+  referrer_name: string;
+  referrer_email: string;
+  referred_name: string;
+  referred_email: string;
+  referred_phone: string | null;
+  message: string | null;
+  created_at: string;
+}
+
 const Admin = () => {
   const [projectRequests, setProjectRequests] = useState<ProjectRequest[]>([]);
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
+  const [referrals, setReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -66,6 +78,15 @@ const Admin = () => {
 
       if (messagesError) throw messagesError;
       setContactMessages(messages || []);
+
+      // Fetch referrals
+      const { data: referralData, error: referralsError } = await supabase
+        .from("referrals")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (referralsError) throw referralsError;
+      setReferrals(referralData || []);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to load submissions");
@@ -118,6 +139,23 @@ const Admin = () => {
     }
   };
 
+  const handleDeleteReferral = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("referrals")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setReferrals(referrals.filter(ref => ref.id !== id));
+      toast.success("Referral deleted successfully");
+    } catch (error) {
+      console.error("Error deleting referral:", error);
+      toast.error("Failed to delete referral");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background py-12">
       <div className="container mx-auto px-4">
@@ -127,7 +165,7 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-8">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-8">
             <TabsTrigger value="projects">
               <FileText className="w-4 h-4 mr-2" />
               Project Requests ({projectRequests.length})
@@ -135,6 +173,10 @@ const Admin = () => {
             <TabsTrigger value="contact">
               <Mail className="w-4 h-4 mr-2" />
               Contact Messages ({contactMessages.length})
+            </TabsTrigger>
+            <TabsTrigger value="referrals">
+              <User className="w-4 h-4 mr-2" />
+              Referrals ({referrals.length})
             </TabsTrigger>
           </TabsList>
 
@@ -284,6 +326,107 @@ const Admin = () => {
                         <p className="text-sm font-semibold text-foreground mb-1">Message:</p>
                         <p className="text-muted-foreground">{message.message}</p>
                       </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="referrals">
+            {loading ? (
+              <p className="text-center text-muted-foreground">Loading...</p>
+            ) : referrals.length === 0 ? (
+              <Card className="card-gradient border-border">
+                <CardContent className="pt-6 text-center text-muted-foreground">
+                  No referrals yet
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-6">
+                {referrals.map((referral) => (
+                  <Card key={referral.id} className="card-gradient border-border">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-xl text-foreground">
+                            Referral from {referral.referrer_name}
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-2 mt-2">
+                            <Calendar className="w-4 h-4" />
+                            {formatDate(referral.created_at)}
+                          </CardDescription>
+                        </div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Referral</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete this referral? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteReferral(referral.id)}>
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <p className="text-sm font-semibold text-foreground mb-2">Referrer Information</p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <User className="w-4 h-4 text-primary" />
+                              {referral.referrer_name}
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Mail className="w-4 h-4 text-secondary" />
+                              <a href={`mailto:${referral.referrer_email}`} className="hover:text-secondary">
+                                {referral.referrer_email}
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-foreground mb-2">Referred Person</p>
+                          <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <User className="w-4 h-4 text-primary" />
+                              {referral.referred_name}
+                            </div>
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Mail className="w-4 h-4 text-secondary" />
+                              <a href={`mailto:${referral.referred_email}`} className="hover:text-secondary">
+                                {referral.referred_email}
+                              </a>
+                            </div>
+                            {referral.referred_phone && (
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Phone className="w-4 h-4 text-accent" />
+                                <a href={`tel:${referral.referred_phone}`} className="hover:text-accent">
+                                  {referral.referred_phone}
+                                </a>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {referral.message && (
+                        <div className="mt-4">
+                          <p className="text-sm font-semibold text-foreground mb-1">Message:</p>
+                          <p className="text-muted-foreground">{referral.message}</p>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 ))}

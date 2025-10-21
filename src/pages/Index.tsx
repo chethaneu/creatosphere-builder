@@ -4,6 +4,7 @@ import Services from "@/components/Services";
 import RequestForm from "@/components/RequestForm";
 import Projects from "@/components/Projects";
 import About from "@/components/About";
+import Referral from "@/components/Referral";
 import Contact from "@/components/Contact";
 
 const Index = () => {
@@ -17,6 +18,7 @@ const Index = () => {
         <RequestForm />
         <Projects />
         <About />
+        <Referral />
         <Contact />
       </main>
       
