@@ -1,9 +1,21 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { FileText, Mail, Calendar, User, Phone } from "lucide-react";
+import { FileText, Mail, Calendar, User, Phone, Trash2 } from "lucide-react";
 
 interface ProjectRequest {
   id: string;
@@ -72,6 +84,40 @@ const Admin = () => {
     });
   };
 
+  const handleDeleteProjectRequest = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("project_requests")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setProjectRequests(projectRequests.filter(req => req.id !== id));
+      toast.success("Project request deleted successfully");
+    } catch (error) {
+      console.error("Error deleting project request:", error);
+      toast.error("Failed to delete project request");
+    }
+  };
+
+  const handleDeleteContactMessage = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("contact_messages")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setContactMessages(contactMessages.filter(msg => msg.id !== id));
+      toast.success("Contact message deleted successfully");
+    } catch (error) {
+      console.error("Error deleting contact message:", error);
+      toast.error("Failed to delete contact message");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background py-12">
       <div className="container mx-auto px-4">
@@ -107,7 +153,7 @@ const Admin = () => {
                   <Card key={request.id} className="card-gradient border-border">
                     <CardHeader>
                       <div className="flex items-start justify-between">
-                        <div>
+                        <div className="flex-1">
                           <CardTitle className="text-xl text-foreground flex items-center gap-2">
                             <User className="w-5 h-5 text-primary" />
                             {request.name}
@@ -117,8 +163,31 @@ const Admin = () => {
                             {formatDate(request.created_at)}
                           </CardDescription>
                         </div>
-                        <div className="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
-                          {request.project_type}
+                        <div className="flex items-center gap-2">
+                          <div className="inline-flex px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">
+                            {request.project_type}
+                          </div>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Project Request</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete this project request from {request.name}? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteProjectRequest(request.id)}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
                     </CardHeader>
@@ -170,14 +239,39 @@ const Admin = () => {
                 {contactMessages.map((message) => (
                   <Card key={message.id} className="card-gradient border-border">
                     <CardHeader>
-                      <CardTitle className="text-xl text-foreground flex items-center gap-2">
-                        <User className="w-5 h-5 text-primary" />
-                        {message.name}
-                      </CardTitle>
-                      <CardDescription className="flex items-center gap-2">
-                        <Calendar className="w-4 h-4" />
-                        {formatDate(message.created_at)}
-                      </CardDescription>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-xl text-foreground flex items-center gap-2">
+                            <User className="w-5 h-5 text-primary" />
+                            {message.name}
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-2 mt-2">
+                            <Calendar className="w-4 h-4" />
+                            {formatDate(message.created_at)}
+                          </CardDescription>
+                        </div>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Delete Contact Message</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete this message from {message.name}? This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteContactMessage(message.id)}>
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
                       <div className="flex items-center gap-2 text-muted-foreground">
