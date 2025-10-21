@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { FileText, Mail, Calendar, User, Phone, Trash2 } from "lucide-react";
+import { FileText, Mail, Calendar, User, Phone, Trash2, LogOut } from "lucide-react";
+import type { User as SupabaseUser } from "@supabase/supabase-js";
 
 interface ProjectRequest {
   id: string;
@@ -48,14 +50,37 @@ interface Referral {
 }
 
 const Admin = () => {
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [projectRequests, setProjectRequests] = useState<ProjectRequest[]>([]);
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [referrals, setReferrals] = useState<Referral[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    // Check authentication
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate("/auth");
+        return;
+      }
+      setUser(session.user);
+      fetchData();
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!session) {
+          navigate("/auth");
+        } else {
+          setUser(session.user);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const fetchData = async () => {
     try {
@@ -93,6 +118,12 @@ const Admin = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/auth");
+    toast.success("Logged out successfully");
   };
 
   const formatDate = (dateString: string) => {
@@ -156,12 +187,22 @@ const Admin = () => {
     }
   };
 
+  if (loading || !user) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-background py-12">
       <div className="container mx-auto px-4">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gradient mb-2">Admin Dashboard</h1>
-          <p className="text-muted-foreground">View all form submissions</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-bold text-gradient mb-2">Admin Dashboard</h1>
+            <p className="text-muted-foreground">View all form submissions</p>
+          </div>
+          <Button onClick={handleLogout} variant="outline" className="gap-2">
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
         </div>
 
         <Tabs defaultValue="projects" className="w-full">
@@ -422,7 +463,7 @@ const Admin = () => {
                         </div>
                       </div>
                       {referral.message && (
-                        <div className="mt-4">
+                        <div>
                           <p className="text-sm font-semibold text-foreground mb-1">Message:</p>
                           <p className="text-muted-foreground">{referral.message}</p>
                         </div>

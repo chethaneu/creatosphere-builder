@@ -7,6 +7,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { Mail, Phone, Send } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().trim()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
+  email: z.string().trim()
+    .email("Invalid email address")
+    .max(255, "Email must be less than 255 characters"),
+  message: z.string().trim()
+    .min(1, "Message is required")
+    .max(1000, "Message must be less than 1000 characters")
+});
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -18,18 +31,21 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.email || !formData.message) {
-      toast.error("Please fill in all fields");
+    // Validate input
+    const validation = contactSchema.safeParse(formData);
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
       return;
     }
     
     try {
+      const { data: validatedData } = validation;
       const { error } = await supabase
         .from("contact_messages")
         .insert({
-          name: formData.name,
-          email: formData.email,
-          message: formData.message
+          name: validatedData.name,
+          email: validatedData.email,
+          message: validatedData.message
         });
 
       if (error) throw error;
@@ -69,6 +85,7 @@ const Contact = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="mt-2 bg-input border-border text-foreground"
+                  maxLength={100}
                   required
                 />
               </div>
@@ -81,6 +98,7 @@ const Contact = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="mt-2 bg-input border-border text-foreground"
+                  maxLength={255}
                   required
                 />
               </div>
@@ -93,6 +111,7 @@ const Contact = () => {
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   className="mt-2 bg-input border-border text-foreground min-h-32"
                   placeholder="Your message..."
+                  maxLength={1000}
                   required
                 />
               </div>

@@ -8,6 +8,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "sonner";
 import { FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const requestSchema = z.object({
+  name: z.string().trim()
+    .min(1, "Name is required")
+    .max(100, "Name must be less than 100 characters"),
+  email: z.string().trim()
+    .email("Invalid email address")
+    .max(255, "Email must be less than 255 characters"),
+  phone: z.string().trim()
+    .max(20, "Phone number must be less than 20 characters")
+    .optional()
+    .or(z.literal("")),
+  projectType: z.string().min(1, "Project type is required"),
+  description: z.string().trim()
+    .max(2000, "Description must be less than 2000 characters")
+    .optional()
+    .or(z.literal("")),
+  budget: z.string().trim()
+    .max(100, "Budget must be less than 100 characters")
+    .optional()
+    .or(z.literal(""))
+});
 
 const RequestForm = () => {
   const [formData, setFormData] = useState({
@@ -22,22 +45,24 @@ const RequestForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Basic validation
-    if (!formData.name || !formData.email || !formData.projectType) {
-      toast.error("Please fill in all required fields");
+    // Validate input
+    const validation = requestSchema.safeParse(formData);
+    if (!validation.success) {
+      toast.error(validation.error.errors[0].message);
       return;
     }
     
     try {
+      const { data: validatedData } = validation;
       const { error } = await supabase
         .from("project_requests")
         .insert({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone || null,
-          project_type: formData.projectType,
-          description: formData.description || null,
-          budget: formData.budget || null
+          name: validatedData.name,
+          email: validatedData.email,
+          phone: validatedData.phone || null,
+          project_type: validatedData.projectType,
+          description: validatedData.description || null,
+          budget: validatedData.budget || null
         });
 
       if (error) throw error;
@@ -84,6 +109,7 @@ const RequestForm = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="mt-2 bg-input border-border text-foreground"
+                  maxLength={100}
                   required
                 />
               </div>
@@ -97,6 +123,7 @@ const RequestForm = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     className="mt-2 bg-input border-border text-foreground"
+                    maxLength={255}
                     required
                   />
                 </div>
@@ -109,6 +136,7 @@ const RequestForm = () => {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="mt-2 bg-input border-border text-foreground"
+                    maxLength={20}
                   />
                 </div>
               </div>
@@ -140,6 +168,7 @@ const RequestForm = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="mt-2 bg-input border-border text-foreground min-h-32"
                   placeholder="Describe your project requirements..."
+                  maxLength={2000}
                 />
               </div>
               
@@ -151,6 +180,7 @@ const RequestForm = () => {
                   onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                   className="mt-2 bg-input border-border text-foreground"
                   placeholder="e.g., ₹5,000 - ₹10,000"
+                  maxLength={100}
                 />
               </div>
               
