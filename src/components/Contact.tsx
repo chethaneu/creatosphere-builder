@@ -127,19 +127,15 @@ const Contact = () => {
             </form>
             
             <div className="border-t border-border pt-6 space-y-3 text-center">
-              <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <a href="tel:6361510130" className="flex items-center justify-center gap-2 text-muted-foreground hover:text-primary transition-colors">
                 <Phone className="w-5 h-5 text-primary" />
-                <a href="tel:6361510130" className="hover:text-primary transition-colors">
-                  6361510130
-                </a>
-              </div>
+                <span className="sr-only">Call 6361510130</span>
+              </a>
               
-              <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <a href="mailto:chethanchethueu11@gmail.com" className="flex items-center justify-center gap-2 text-muted-foreground hover:text-secondary transition-colors">
                 <Mail className="w-5 h-5 text-secondary" />
-                <a href="mailto:chethanchethueu11@gmail.com" className="hover:text-secondary transition-colors">
-                  chethanchethueu11@gmail.com
-                </a>
-              </div>
+                <span className="sr-only">Email chethanchethueu11@gmail.com</span>
+              </a>
             </div>
           </CardContent>
         </Card>
