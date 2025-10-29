@@ -6,6 +6,7 @@ import Projects from "@/components/Projects";
 import About from "@/components/About";
 import Referral from "@/components/Referral";
 import Contact from "@/components/Contact";
+import ProjectIdeasFinder from "@/components/ProjectIdeasFinder";
 
 const Index = () => {
   return (
@@ -15,6 +16,7 @@ const Index = () => {
       <main>
         <Hero />
         <Services />
+        <ProjectIdeasFinder />
         <RequestForm />
         <Referral />
         <Projects />
