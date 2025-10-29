@@ -3,10 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, Sparkles, Loader2, Clock, Code } from "lucide-react";
+import { Lightbulb, Sparkles, Loader2, Clock, Code, Rocket } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import ProjectBuildRequestDialog from "./ProjectBuildRequestDialog";
 
 interface ProjectIdea {
   title: string;
@@ -25,6 +26,13 @@ const ProjectIdeasFinder = () => {
   const [timeCommitment, setTimeCommitment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [projects, setProjects] = useState<ProjectIdea[]>([]);
+  const [selectedProject, setSelectedProject] = useState<ProjectIdea | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleGetItDone = (project: ProjectIdea) => {
+    setSelectedProject(project);
+    setIsDialogOpen(true);
+  };
 
   const handleFindProjects = async () => {
     if (!skillLevel || !interest || !department) {
@@ -272,9 +280,19 @@ const ProjectIdeasFinder = () => {
                               </Badge>
                             ))}
                           </div>
-                          <Button className="w-full mt-2" variant="secondary">
-                            Build Now
-                          </Button>
+                          <div className="grid grid-cols-2 gap-2 mt-2">
+                            <Button variant="secondary" className="w-full">
+                              Build Now
+                            </Button>
+                            <Button 
+                              variant="default" 
+                              className="w-full"
+                              onClick={() => handleGetItDone(project)}
+                            >
+                              <Rocket className="w-4 h-4 mr-2" />
+                              Get it done by us
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -284,6 +302,18 @@ const ProjectIdeasFinder = () => {
             )}
           </CardContent>
         </Card>
+
+        {selectedProject && (
+          <ProjectBuildRequestDialog
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            projectTitle={selectedProject.title}
+            projectDescription={selectedProject.description}
+            skillLevel={skillLevel}
+            interest={interest}
+            department={department}
+          />
+        )}
       </div>
     </section>
   );

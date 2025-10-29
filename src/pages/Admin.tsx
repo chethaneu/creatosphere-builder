@@ -49,11 +49,28 @@ interface Referral {
   created_at: string;
 }
 
+interface ProjectBuildRequest {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  project_title: string;
+  project_description: string | null;
+  skill_level: string | null;
+  interest: string | null;
+  department: string | null;
+  additional_requirements: string | null;
+  budget_range: string | null;
+  timeline: string | null;
+  created_at: string;
+}
+
 const Admin = () => {
   const [user, setUser] = useState<SupabaseUser | null>(null);
   const [projectRequests, setProjectRequests] = useState<ProjectRequest[]>([]);
   const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
   const [referrals, setReferrals] = useState<Referral[]>([]);
+  const [buildRequests, setBuildRequests] = useState<ProjectBuildRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -112,6 +129,15 @@ const Admin = () => {
 
       if (referralsError) throw referralsError;
       setReferrals(referralData || []);
+
+      // Fetch project build requests
+      const { data: buildData, error: buildError } = await supabase
+        .from("project_build_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (buildError) throw buildError;
+      setBuildRequests(buildData || []);
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to load submissions");
@@ -187,6 +213,23 @@ const Admin = () => {
     }
   };
 
+  const handleDeleteBuildRequest = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("project_build_requests")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setBuildRequests(buildRequests.filter(req => req.id !== id));
+      toast.success("Build request deleted successfully");
+    } catch (error) {
+      console.error("Error deleting build request:", error);
+      toast.error("Failed to delete build request");
+    }
+  };
+
   if (loading || !user) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
@@ -206,14 +249,18 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="projects" className="w-full">
-          <TabsList className="grid w-full max-w-2xl grid-cols-3 mb-8">
+          <TabsList className="grid w-full max-w-3xl grid-cols-4 mb-8">
             <TabsTrigger value="projects">
               <FileText className="w-4 h-4 mr-2" />
-              Project Requests ({projectRequests.length})
+              Requests ({projectRequests.length})
+            </TabsTrigger>
+            <TabsTrigger value="builds">
+              <FileText className="w-4 h-4 mr-2" />
+              AI Builds ({buildRequests.length})
             </TabsTrigger>
             <TabsTrigger value="contact">
               <Mail className="w-4 h-4 mr-2" />
-              Contact Messages ({contactMessages.length})
+              Messages ({contactMessages.length})
             </TabsTrigger>
             <TabsTrigger value="referrals">
               <User className="w-4 h-4 mr-2" />
@@ -301,6 +348,132 @@ const Admin = () => {
                           <p className="text-muted-foreground">{request.budget}</p>
                         </div>
                       )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="builds">
+            {loading ? (
+              <p className="text-center text-muted-foreground">Loading...</p>
+            ) : buildRequests.length === 0 ? (
+              <Card className="card-gradient border-border">
+                <CardContent className="pt-6 text-center text-muted-foreground">
+                  No AI project build requests yet
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-6">
+                {buildRequests.map((request) => (
+                  <Card key={request.id} className="card-gradient border-border">
+                    <CardHeader>
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-xl text-foreground flex items-center gap-2">
+                            <User className="w-5 h-5 text-primary" />
+                            {request.name}
+                          </CardTitle>
+                          <CardDescription className="flex items-center gap-2 mt-2">
+                            <Calendar className="w-4 h-4" />
+                            {formatDate(request.created_at)}
+                          </CardDescription>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="inline-flex px-3 py-1 rounded-full bg-secondary/10 text-secondary text-sm">
+                            AI Generated
+                          </div>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Build Request</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete this build request from {request.name}? This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteBuildRequest(request.id)}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Mail className="w-4 h-4 text-secondary" />
+                            <a href={`mailto:${request.email}`} className="hover:text-secondary">
+                              {request.email}
+                            </a>
+                          </div>
+                          {request.phone && (
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Phone className="w-4 h-4 text-accent" />
+                              <a href={`tel:${request.phone}`} className="hover:text-accent">
+                                {request.phone}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          {request.budget_range && (
+                            <p className="text-sm"><span className="font-semibold text-foreground">Budget:</span> {request.budget_range}</p>
+                          )}
+                          {request.timeline && (
+                            <p className="text-sm"><span className="font-semibold text-foreground">Timeline:</span> {request.timeline}</p>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3 pt-3 border-t border-border">
+                        <div>
+                          <p className="text-sm font-semibold text-foreground mb-1">Project Title:</p>
+                          <p className="text-primary font-medium">{request.project_title}</p>
+                        </div>
+                        {request.project_description && (
+                          <div>
+                            <p className="text-sm font-semibold text-foreground mb-1">Project Description:</p>
+                            <p className="text-muted-foreground text-sm">{request.project_description}</p>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-3 gap-3 pt-2">
+                          {request.skill_level && (
+                            <div className="bg-primary/10 px-3 py-2 rounded">
+                              <p className="text-xs text-muted-foreground">Skill Level</p>
+                              <p className="text-sm font-medium text-primary">{request.skill_level}</p>
+                            </div>
+                          )}
+                          {request.interest && (
+                            <div className="bg-secondary/10 px-3 py-2 rounded">
+                              <p className="text-xs text-muted-foreground">Interest</p>
+                              <p className="text-sm font-medium text-secondary">{request.interest}</p>
+                            </div>
+                          )}
+                          {request.department && (
+                            <div className="bg-accent/10 px-3 py-2 rounded">
+                              <p className="text-xs text-muted-foreground">Department</p>
+                              <p className="text-sm font-medium text-accent-foreground">{request.department}</p>
+                            </div>
+                          )}
+                        </div>
+                        {request.additional_requirements && (
+                          <div>
+                            <p className="text-sm font-semibold text-foreground mb-1">Additional Requirements:</p>
+                            <p className="text-muted-foreground text-sm">{request.additional_requirements}</p>
+                          </div>
+                        )}
+                      </div>
                     </CardContent>
                   </Card>
                 ))}

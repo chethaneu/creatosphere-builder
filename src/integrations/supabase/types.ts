@@ -38,6 +38,54 @@ export type Database = {
         }
         Relationships: []
       }
+      project_build_requests: {
+        Row: {
+          additional_requirements: string | null
+          budget_range: string | null
+          created_at: string
+          department: string | null
+          email: string
+          id: string
+          interest: string | null
+          name: string
+          phone: string | null
+          project_description: string | null
+          project_title: string
+          skill_level: string | null
+          timeline: string | null
+        }
+        Insert: {
+          additional_requirements?: string | null
+          budget_range?: string | null
+          created_at?: string
+          department?: string | null
+          email: string
+          id?: string
+          interest?: string | null
+          name: string
+          phone?: string | null
+          project_description?: string | null
+          project_title: string
+          skill_level?: string | null
+          timeline?: string | null
+        }
+        Update: {
+          additional_requirements?: string | null
+          budget_range?: string | null
+          created_at?: string
+          department?: string | null
+          email?: string
+          id?: string
+          interest?: string | null
+          name?: string
+          phone?: string | null
+          project_description?: string | null
+          project_title?: string
+          skill_level?: string | null
+          timeline?: string | null
+        }
+        Relationships: []
+      }
       project_requests: {
         Row: {
           budget: string | null
