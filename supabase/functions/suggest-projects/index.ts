@@ -11,25 +11,39 @@ serve(async (req) => {
   }
 
   try {
-    const { skillLevel, interest } = await req.json();
+    const { skillLevel, interest, department, projectType, timeCommitment } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You are a project idea generator for students and developers. Generate creative, practical, and trending project ideas based on user's skill level and interests. Each project should be realistic and achievable.`;
+    const systemPrompt = `You are an expert project idea generator for students and developers. Generate creative, practical, and industry-relevant project ideas that align with real-world applications. Focus on projects that can make an impact in the specified industry/department.`;
 
-    const userPrompt = `Generate 5 project ideas for someone with ${skillLevel} skill level interested in ${interest}. 
-    
+    const userPrompt = `Generate 5 project ideas with the following requirements:
+
+**User Profile:**
+- Skill Level: ${skillLevel}
+- Technical Interest: ${interest}
+- Target Industry/Department: ${department}
+${projectType && projectType !== "Any" ? `- Preferred Project Type: ${projectType}` : ""}
+${timeCommitment && timeCommitment !== "Flexible" ? `- Time Commitment: ${timeCommitment}` : ""}
+
+**Requirements:**
+1. Projects should be relevant to the ${department} industry/sector
+2. Match the ${skillLevel} skill level appropriately
+3. Focus on ${interest} technologies and concepts
+4. Include real-world applications and impact
+5. Be innovative and address current industry challenges
+
 For each project, provide:
-- A catchy project title
-- A brief description (2-3 sentences)
-- Difficulty rating (Easy, Medium, Hard)
-- Key technologies/skills involved
-- Estimated time to complete
+- A compelling project title that reflects its purpose
+- A detailed description (2-3 sentences) explaining the project, its goals, and real-world impact
+- Difficulty rating (Easy, Medium, Hard) appropriate for ${skillLevel} level
+- Key technologies/frameworks/tools needed
+- Realistic estimated time to complete
 
-Format your response as a JSON array of projects.`;
+Make the projects practical, achievable, and valuable for portfolio building.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",

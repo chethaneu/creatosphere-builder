@@ -20,14 +20,17 @@ const ProjectIdeasFinder = () => {
   const { toast } = useToast();
   const [skillLevel, setSkillLevel] = useState("");
   const [interest, setInterest] = useState("");
+  const [department, setDepartment] = useState("");
+  const [projectType, setProjectType] = useState("");
+  const [timeCommitment, setTimeCommitment] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [projects, setProjects] = useState<ProjectIdea[]>([]);
 
   const handleFindProjects = async () => {
-    if (!skillLevel || !interest) {
+    if (!skillLevel || !interest || !department) {
       toast({
         title: "Missing Information",
-        description: "Please select both skill level and area of interest.",
+        description: "Please fill in all required fields (marked with *).",
         variant: "destructive",
       });
       return;
@@ -38,7 +41,13 @@ const ProjectIdeasFinder = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke("suggest-projects", {
-        body: { skillLevel, interest },
+        body: { 
+          skillLevel, 
+          interest, 
+          department,
+          projectType: projectType || "Any",
+          timeCommitment: timeCommitment || "Flexible"
+        },
       });
 
       if (error) {
@@ -106,21 +115,25 @@ const ProjectIdeasFinder = () => {
           <CardContent className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <Label htmlFor="skillLevel">Skill Level</Label>
+                <Label htmlFor="skillLevel">
+                  Skill Level <span className="text-destructive">*</span>
+                </Label>
                 <Select value={skillLevel} onValueChange={setSkillLevel}>
                   <SelectTrigger id="skillLevel">
                     <SelectValue placeholder="Select your skill level" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Beginner">Beginner</SelectItem>
-                    <SelectItem value="Intermediate">Intermediate</SelectItem>
-                    <SelectItem value="Expert">Expert</SelectItem>
+                    <SelectItem value="Beginner">Beginner - Just starting out</SelectItem>
+                    <SelectItem value="Intermediate">Intermediate - Some experience</SelectItem>
+                    <SelectItem value="Expert">Expert - Advanced knowledge</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="interest">Area of Interest</Label>
+                <Label htmlFor="interest">
+                  Area of Interest <span className="text-destructive">*</span>
+                </Label>
                 <Select value={interest} onValueChange={setInterest}>
                   <SelectTrigger id="interest">
                     <SelectValue placeholder="Choose your interest" />
@@ -136,6 +149,71 @@ const ProjectIdeasFinder = () => {
                     <SelectItem value="DevOps">DevOps</SelectItem>
                     <SelectItem value="Blockchain">Blockchain</SelectItem>
                     <SelectItem value="Cloud Computing">Cloud Computing</SelectItem>
+                    <SelectItem value="IoT & Embedded Systems">IoT & Embedded Systems</SelectItem>
+                    <SelectItem value="Computer Vision">Computer Vision</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="department">
+                  Department/Industry <span className="text-destructive">*</span>
+                </Label>
+                <Select value={department} onValueChange={setDepartment}>
+                  <SelectTrigger id="department">
+                    <SelectValue placeholder="Select department" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Healthcare">Healthcare</SelectItem>
+                    <SelectItem value="Finance">Finance & Banking</SelectItem>
+                    <SelectItem value="Education">Education</SelectItem>
+                    <SelectItem value="E-commerce">E-commerce & Retail</SelectItem>
+                    <SelectItem value="Manufacturing">Manufacturing</SelectItem>
+                    <SelectItem value="Agriculture">Agriculture</SelectItem>
+                    <SelectItem value="Transportation">Transportation & Logistics</SelectItem>
+                    <SelectItem value="Entertainment">Entertainment & Media</SelectItem>
+                    <SelectItem value="Real Estate">Real Estate</SelectItem>
+                    <SelectItem value="Energy">Energy & Utilities</SelectItem>
+                    <SelectItem value="Government">Government & Public Services</SelectItem>
+                    <SelectItem value="Non-Profit">Non-Profit & Social Impact</SelectItem>
+                    <SelectItem value="Sports">Sports & Fitness</SelectItem>
+                    <SelectItem value="Travel">Travel & Hospitality</SelectItem>
+                    <SelectItem value="General">General Purpose</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="projectType">Project Type (Optional)</Label>
+                <Select value={projectType} onValueChange={setProjectType}>
+                  <SelectTrigger id="projectType">
+                    <SelectValue placeholder="Any type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Web Application">Web Application</SelectItem>
+                    <SelectItem value="Mobile App">Mobile App</SelectItem>
+                    <SelectItem value="Desktop Application">Desktop Application</SelectItem>
+                    <SelectItem value="API/Backend">API/Backend Service</SelectItem>
+                    <SelectItem value="Data Science">Data Science Project</SelectItem>
+                    <SelectItem value="Machine Learning Model">ML Model</SelectItem>
+                    <SelectItem value="Automation Tool">Automation Tool</SelectItem>
+                    <SelectItem value="Game">Game</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2 md:col-span-2">
+                <Label htmlFor="timeCommitment">Time Commitment (Optional)</Label>
+                <Select value={timeCommitment} onValueChange={setTimeCommitment}>
+                  <SelectTrigger id="timeCommitment">
+                    <SelectValue placeholder="Flexible timeline" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1-2 weeks">1-2 weeks (Quick project)</SelectItem>
+                    <SelectItem value="2-4 weeks">2-4 weeks (Short term)</SelectItem>
+                    <SelectItem value="1-2 months">1-2 months (Medium term)</SelectItem>
+                    <SelectItem value="2-3 months">2-3 months (Long term)</SelectItem>
+                    <SelectItem value="3+ months">3+ months (Extensive project)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -143,7 +221,7 @@ const ProjectIdeasFinder = () => {
 
             <Button
               onClick={handleFindProjects}
-              disabled={isLoading || !skillLevel || !interest}
+              disabled={isLoading || !skillLevel || !interest || !department}
               className="w-full"
               size="lg"
             >
