@@ -39,18 +39,30 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    /* Custom gradients */
+    /* Enhanced gradients */
     --gradient-primary: linear-gradient(135deg, hsl(220, 97%, 57%), hsl(265, 84%, 42%));
     --gradient-hero: linear-gradient(180deg, hsl(0, 0%, 5%) 0%, hsl(220, 97%, 20%) 100%);
     --gradient-accent: linear-gradient(135deg, hsl(265, 84%, 42%), hsl(132, 98%, 78%));
+    --gradient-radial: radial-gradient(circle at 50% 50%, hsl(220, 97%, 57% / 0.15), transparent 70%);
+    --gradient-mesh: radial-gradient(at 0% 0%, hsl(220, 97%, 57% / 0.2) 0px, transparent 50%),
+                     radial-gradient(at 100% 0%, hsl(265, 84%, 42% / 0.2) 0px, transparent 50%),
+                     radial-gradient(at 100% 100%, hsl(132, 98%, 78% / 0.2) 0px, transparent 50%),
+                     radial-gradient(at 0% 100%, hsl(220, 97%, 57% / 0.2) 0px, transparent 50%);
     
-    /* Glow effects */
+    /* Enhanced glow effects */
     --glow-primary: 0 0 40px hsl(220, 97%, 57% / 0.4);
     --glow-secondary: 0 0 40px hsl(265, 84%, 42% / 0.4);
     --glow-accent: 0 0 30px hsl(132, 98%, 78% / 0.3);
+    --glow-primary-lg: 0 0 60px hsl(220, 97%, 57% / 0.5), 0 0 100px hsl(220, 97%, 57% / 0.3);
+    --glow-accent-lg: 0 0 50px hsl(132, 98%, 78% / 0.4), 0 0 80px hsl(132, 98%, 78% / 0.2);
+    
+    /* Shadows */
+    --shadow-glass: 0 8px 32px 0 hsl(0, 0%, 0% / 0.37);
+    --shadow-elevated: 0 20px 50px -12px hsl(0, 0%, 0% / 0.5);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 
@@ -59,8 +71,18 @@ All colors MUST be HSL.
     @apply bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent;
   }
   
+  .text-gradient-shine {
+    @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
+    background-size: 200% auto;
+    animation: shine 3s linear infinite;
+  }
+  
   .glow-primary {
     box-shadow: var(--glow-primary);
+  }
+  
+  .glow-primary-lg {
+    box-shadow: var(--glow-primary-lg);
   }
   
   .glow-secondary {
@@ -71,9 +93,62 @@ All colors MUST be HSL.
     box-shadow: var(--glow-accent);
   }
   
+  .glow-accent-lg {
+    box-shadow: var(--glow-accent-lg);
+  }
+  
   .card-gradient {
     background: linear-gradient(135deg, hsl(0, 0%, 8%), hsl(0, 0%, 12%));
     border: 1px solid hsl(0, 0%, 20%);
+  }
+  
+  .card-glass {
+    background: linear-gradient(135deg, hsl(0, 0%, 10% / 0.7), hsl(0, 0%, 8% / 0.5));
+    backdrop-filter: blur(10px);
+    border: 1px solid hsl(0, 0%, 25% / 0.5);
+    box-shadow: var(--shadow-glass);
+  }
+  
+  .card-elevated {
+    background: linear-gradient(135deg, hsl(0, 0%, 10%), hsl(0, 0%, 8%));
+    border: 1px solid hsl(0, 0%, 25%);
+    box-shadow: var(--shadow-elevated);
+  }
+  
+  .bg-mesh {
+    background-image: var(--gradient-mesh);
+  }
+  
+  @keyframes shine {
+    to {
+      background-position: 200% center;
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+  
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
   }
 }
 
