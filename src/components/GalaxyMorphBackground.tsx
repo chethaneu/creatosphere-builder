@@ -20,73 +20,62 @@ const GalaxyParticles = () => {
   const particleCount = isMobile ? 150 : 450;
 
   // Create particles and morph target positions
-  const { positions, targetPositions, colors, sizes, initialPositions } = useMemo(() => {
+  const { positions, targetPositions, colors, sizes } = useMemo(() => {
     const positions = new Float32Array(particleCount * 3);
-    const initialPositions = new Float32Array(particleCount * 3);
     const targetPositions = new Float32Array(particleCount * 3);
     const colors = new Float32Array(particleCount * 3);
     const sizes = new Float32Array(particleCount);
 
-    // Generate particle positions in a perfect sphere
+    // Text "TECHSPHERE" as morph target
+    const text = "TECHSPHERE";
+    const gridCols = 60;
+    const gridRows = 10;
+    const spacing = 0.15;
+
+    // Generate particle positions in a sphere (galaxy bubble)
     for (let i = 0; i < particleCount; i++) {
-      // Perfect sphere distribution using Fibonacci sphere algorithm
-      const phi = Math.acos(1 - 2 * (i + 0.5) / particleCount);
-      const theta = Math.PI * (1 + Math.sqrt(5)) * i;
+      // Initial sphere distribution with depth layers
+      const radius = 2.8 + (Math.random() - 0.5) * 1.5;
+      const theta = Math.random() * Math.PI * 2;
+      const phi = Math.acos(2 * Math.random() - 1);
       
-      const radius = 3 + Math.random() * 0.5; // Sphere radius
-      
-      const x = radius * Math.sin(phi) * Math.cos(theta);
-      const y = radius * Math.sin(phi) * Math.sin(theta);
-      const z = radius * Math.cos(phi);
-      
-      positions[i * 3] = x;
-      positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
-      
-      // Store initial positions
-      initialPositions[i * 3] = x;
-      initialPositions[i * 3 + 1] = y;
-      initialPositions[i * 3 + 2] = z;
+      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = radius * Math.cos(phi) - 2;
 
-      // Target positions forming "TECHSPHERE" text
-      const text = "TECHSPHERE";
-      const charsPerParticleGroup = Math.floor(particleCount / text.length);
-      const charIndex = Math.floor(i / charsPerParticleGroup);
-      const particleInChar = i % charsPerParticleGroup;
+      // Target positions forming "TECHSPHERE" text grid
+      const textIdx = Math.floor((i / particleCount) * text.length);
+      const char = text[textIdx] || ' ';
+      const charOffset = textIdx * 3;
       
-      // Create grid for each character
-      const gridSize = Math.ceil(Math.sqrt(charsPerParticleGroup));
-      const row = Math.floor(particleInChar / gridSize);
-      const col = particleInChar % gridSize;
+      const row = Math.floor((i % (particleCount / text.length)) / (gridCols));
+      const col = (i % gridCols);
       
-      // Spacing and positioning
-      const charSpacing = 0.8;
-      const particleSpacing = 0.08;
-      const totalWidth = text.length * charSpacing;
+      // Create letter-like clusters
+      const inLetter = char !== ' ' && Math.random() > 0.3;
       
-      targetPositions[i * 3] = (charIndex * charSpacing - totalWidth / 2) + (col - gridSize / 2) * particleSpacing;
-      targetPositions[i * 3 + 1] = (row - gridSize / 2) * particleSpacing;
-      targetPositions[i * 3 + 2] = 0;
+      targetPositions[i * 3] = (col - gridCols / 2) * spacing * 0.6 + charOffset - text.length * 1.5;
+      targetPositions[i * 3 + 1] = (row - gridRows / 2) * spacing + (Math.random() - 0.5) * 0.2;
+      targetPositions[i * 3 + 2] = inLetter ? 0 : -5;
 
-      // Vibrant color palette
+      // Color palette - galaxy to accent
       const colorPalette = [
         new THREE.Color('#6EE7F9'),
         new THREE.Color('#64B5FF'),
         new THREE.Color('#A8FFED'),
         new THREE.Color('#FFD6A5'),
         new THREE.Color('#FFFFFF'),
-        new THREE.Color('#00D1FF'),
       ];
       const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
       colors[i * 3] = color.r;
       colors[i * 3 + 1] = color.g;
       colors[i * 3 + 2] = color.b;
 
-      // Larger particle sizes for better visibility
-      sizes[i] = Math.random() * 5 + 2;
+      // Varied particle sizes
+      sizes[i] = Math.random() * 4 + 1;
     }
 
-    return { positions, initialPositions, targetPositions, colors, sizes };
+    return { positions, targetPositions, colors, sizes };
   }, [particleCount]);
 
   // Animation frame
@@ -100,66 +89,70 @@ const GalaxyParticles = () => {
     for (let i = 0; i < particleCount; i++) {
       const i3 = i * 3;
       
-      // Get initial sphere position and target text position
-      const initialX = initialPositions[i3];
-      const initialY = initialPositions[i3 + 1];
-      const initialZ = initialPositions[i3 + 2];
+      // Interpolate between sphere and text positions based on scroll
+      const startX = positions[i3];
+      const startY = positions[i3 + 1];
+      const startZ = positions[i3 + 2];
       
       const targetX = targetPositions[i3];
       const targetY = targetPositions[i3 + 1];
       const targetZ = targetPositions[i3 + 2];
 
-      // Easing function for smooth transition
-      const easeProgress = progress < 0.1 
+      // Smooth interpolation with easing
+      const easeProgress = progress < 0.2 
         ? 0 
-        : progress > 0.9 
-          ? 1 
-          : gsap.parseEase("power3.inOut")((progress - 0.1) / 0.8);
+        : progress < 0.6 
+          ? (progress - 0.2) / 0.4 
+          : Math.min((progress - 0.6) / 0.35 + 0.5, 1);
 
-      // Interpolate from sphere to text
-      positions[i3] = initialX + (targetX - initialX) * easeProgress;
-      positions[i3 + 1] = initialY + (targetY - initialY) * easeProgress;
-      positions[i3 + 2] = initialZ + (targetZ - initialZ) * easeProgress;
+      positions[i3] = startX + (targetX - startX) * easeProgress;
+      positions[i3 + 1] = startY + (targetY - startY) * easeProgress;
+      positions[i3 + 2] = startZ + (targetZ - startZ) * easeProgress;
 
-      // Sphere phase - rotation and breathing
-      if (progress < 0.5) {
-        const rotationSpeed = 0.2;
-        const angle = time * rotationSpeed;
-        
-        // Rotate around Y axis
-        const cosAngle = Math.cos(angle);
-        const sinAngle = Math.sin(angle);
-        const x = positions[i3];
-        const z = positions[i3 + 2];
-        
-        positions[i3] = x * cosAngle - z * sinAngle;
-        positions[i3 + 2] = x * sinAngle + z * cosAngle;
-        
-        // Breathing effect
-        const breathe = 1 + Math.sin(time * 0.8) * 0.05;
-        positions[i3] *= breathe;
-        positions[i3 + 1] *= breathe;
-        positions[i3 + 2] *= breathe;
+      // Add orbital motion when in bubble phase
+      if (progress < 0.2) {
+        const orbitSpeed = 0.1;
+        const orbitRadius = 0.1;
+        positions[i3] += Math.cos(time * orbitSpeed + i) * orbitRadius;
+        positions[i3 + 1] += Math.sin(time * orbitSpeed + i) * orbitRadius;
       }
 
-      // Add subtle floating motion in text phase
-      if (progress > 0.5) {
-        positions[i3 + 1] += Math.sin(time + i * 0.1) * 0.01 * (progress - 0.5);
+      // Add breathing effect
+      if (progress < 0.2) {
+        const breathe = Math.sin(time * 0.5) * 0.03;
+        positions[i3] *= 1 + breathe;
+        positions[i3 + 1] *= 1 + breathe;
+      }
+
+      // Mouse interaction
+      const dx = positions[i3] - mousePos.current.x * 5;
+      const dy = positions[i3 + 1] - mousePos.current.y * 5;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 2 && progress < 0.6) {
+        positions[i3] += dx * 0.01;
+        positions[i3 + 1] += dy * 0.01;
       }
     }
 
     particlesRef.current.geometry.attributes.position.needsUpdate = true;
+    
+    // Rotate entire system slightly
+    if (progress < 0.6) {
+      particlesRef.current.rotation.y = time * 0.05;
+    }
   });
 
   // Setup scroll trigger
   useEffect(() => {
-    ScrollTrigger.create({
-      trigger: '#hero-section',
-      start: 'top top',
-      end: 'bottom center',
-      scrub: 1.5,
-      onUpdate: (self) => {
-        scrollProgress.current = self.progress;
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '#hero-section',
+        start: 'top top',
+        end: 'center center',
+        scrub: 1,
+        onUpdate: (self) => {
+          scrollProgress.current = self.progress;
+        },
       },
     });
 
@@ -168,8 +161,19 @@ const GalaxyParticles = () => {
     };
   }, []);
 
+  // Mouse tracking
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      mousePos.current = {
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: -(e.clientY / window.innerHeight) * 2 + 1,
+      };
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
-  // Custom shader material for enhanced glow effect
+  // Custom shader material for glow effect
   const shaderMaterial = useMemo(() => {
     return new THREE.ShaderMaterial({
       uniforms: {
@@ -178,11 +182,12 @@ const GalaxyParticles = () => {
       vertexShader: `
         attribute float size;
         varying vec3 vColor;
+        uniform float time;
         
         void main() {
           vColor = color;
           vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
-          gl_PointSize = size * (400.0 / -mvPosition.z);
+          gl_PointSize = size * (300.0 / -mvPosition.z);
           gl_Position = projectionMatrix * mvPosition;
         }
       `,
@@ -190,14 +195,9 @@ const GalaxyParticles = () => {
         varying vec3 vColor;
         
         void main() {
-          vec2 center = gl_PointCoord - vec2(0.5);
-          float dist = length(center);
-          
-          // Soft glow with bright core
-          float alpha = 1.0 - smoothstep(0.0, 0.5, dist);
-          float glow = pow(alpha, 2.0);
-          
-          gl_FragColor = vec4(vColor * (1.0 + glow), alpha * 0.9);
+          float dist = length(gl_PointCoord - vec2(0.5));
+          float alpha = 1.0 - smoothstep(0.2, 0.5, dist);
+          gl_FragColor = vec4(vColor, alpha);
         }
       `,
       blending: THREE.AdditiveBlending,
