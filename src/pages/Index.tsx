@@ -7,10 +7,12 @@ import About from "@/components/About";
 import Referral from "@/components/Referral";
 import Contact from "@/components/Contact";
 import ProjectIdeasFinder from "@/components/ProjectIdeasFinder";
+import TechSphere from "@/components/TechSphere";
 
 const Index = () => {
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      <TechSphere />
       <Navigation />
       
       <main>
