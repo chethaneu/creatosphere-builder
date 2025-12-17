@@ -8,57 +8,62 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Futuristic dark theme colors */
-    --background: 0 0% 5%;
+    /* Sleek metallic silver/chrome theme */
+    --background: 240 10% 4%;
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 8%;
+    --card: 240 10% 8%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 8%;
+    --popover: 240 10% 8%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 220 97% 57%;
-    --primary-foreground: 0 0% 100%;
+    /* Metallic silver primary */
+    --primary: 0 0% 75%;
+    --primary-foreground: 240 10% 4%;
 
-    --secondary: 265 84% 42%;
-    --secondary-foreground: 0 0% 100%;
+    /* Chrome accent */
+    --secondary: 0 0% 60%;
+    --secondary-foreground: 240 10% 4%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 240 5% 18%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 132 98% 78%;
-    --accent-foreground: 0 0% 10%;
+    /* Bright white accent */
+    --accent: 0 0% 95%;
+    --accent-foreground: 240 10% 4%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 15%;
-    --ring: 220 97% 57%;
+    --border: 0 0% 25%;
+    --input: 240 5% 15%;
+    --ring: 0 0% 75%;
 
     --radius: 0.75rem;
 
-    /* Enhanced gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(220, 97%, 57%), hsl(265, 84%, 42%));
-    --gradient-hero: linear-gradient(180deg, hsl(0, 0%, 5%) 0%, hsl(220, 97%, 20%) 100%);
-    --gradient-accent: linear-gradient(135deg, hsl(265, 84%, 42%), hsl(132, 98%, 78%));
-    --gradient-radial: radial-gradient(circle at 50% 50%, hsl(220, 97%, 57% / 0.15), transparent 70%);
-    --gradient-mesh: radial-gradient(at 0% 0%, hsl(220, 97%, 57% / 0.2) 0px, transparent 50%),
-                     radial-gradient(at 100% 0%, hsl(265, 84%, 42% / 0.2) 0px, transparent 50%),
-                     radial-gradient(at 100% 100%, hsl(132, 98%, 78% / 0.2) 0px, transparent 50%),
-                     radial-gradient(at 0% 100%, hsl(220, 97%, 57% / 0.2) 0px, transparent 50%);
+    /* Metallic gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(0, 0%, 85%), hsl(0, 0%, 55%));
+    --gradient-hero: linear-gradient(180deg, hsl(240, 10%, 4%) 0%, hsl(240, 10%, 8%) 100%);
+    --gradient-metallic: linear-gradient(145deg, hsl(0, 0%, 90%), hsl(0, 0%, 50%), hsl(0, 0%, 80%));
+    --gradient-chrome: linear-gradient(180deg, hsl(0, 0%, 95%) 0%, hsl(0, 0%, 50%) 50%, hsl(0, 0%, 85%) 100%);
+    --gradient-radial: radial-gradient(circle at 50% 50%, hsl(0, 0%, 75% / 0.15), transparent 70%);
+    --gradient-mesh: radial-gradient(at 0% 0%, hsl(0, 0%, 75% / 0.1) 0px, transparent 50%),
+                     radial-gradient(at 100% 0%, hsl(0, 0%, 60% / 0.1) 0px, transparent 50%),
+                     radial-gradient(at 100% 100%, hsl(0, 0%, 90% / 0.1) 0px, transparent 50%),
+                     radial-gradient(at 0% 100%, hsl(0, 0%, 50% / 0.1) 0px, transparent 50%);
     
-    /* Enhanced glow effects */
-    --glow-primary: 0 0 40px hsl(220, 97%, 57% / 0.4);
-    --glow-secondary: 0 0 40px hsl(265, 84%, 42% / 0.4);
-    --glow-accent: 0 0 30px hsl(132, 98%, 78% / 0.3);
-    --glow-primary-lg: 0 0 60px hsl(220, 97%, 57% / 0.5), 0 0 100px hsl(220, 97%, 57% / 0.3);
-    --glow-accent-lg: 0 0 50px hsl(132, 98%, 78% / 0.4), 0 0 80px hsl(132, 98%, 78% / 0.2);
+    /* Chrome glow effects */
+    --glow-primary: 0 0 40px hsl(0, 0%, 75% / 0.3);
+    --glow-secondary: 0 0 40px hsl(0, 0%, 60% / 0.3);
+    --glow-accent: 0 0 30px hsl(0, 0%, 95% / 0.2);
+    --glow-primary-lg: 0 0 60px hsl(0, 0%, 75% / 0.4), 0 0 100px hsl(0, 0%, 80% / 0.2);
+    --glow-accent-lg: 0 0 50px hsl(0, 0%, 95% / 0.3), 0 0 80px hsl(0, 0%, 90% / 0.15);
     
     /* Shadows */
-    --shadow-glass: 0 8px 32px 0 hsl(0, 0%, 0% / 0.37);
-    --shadow-elevated: 0 20px 50px -12px hsl(0, 0%, 0% / 0.5);
+    --shadow-glass: 0 8px 32px 0 hsl(0, 0%, 0% / 0.5);
+    --shadow-elevated: 0 20px 50px -12px hsl(0, 0%, 0% / 0.6);
+    --shadow-chrome: 0 4px 20px hsl(0, 0%, 0% / 0.4), inset 0 1px 0 hsl(0, 0%, 100% / 0.1);
     
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -72,9 +77,23 @@ All colors MUST be HSL.
   }
   
   .text-gradient-shine {
-    @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
+    background: linear-gradient(90deg, hsl(0, 0%, 75%), hsl(0, 0%, 95%), hsl(0, 0%, 75%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     background-size: 200% auto;
     animation: shine 3s linear infinite;
+  }
+  
+  .text-metallic {
+    background: linear-gradient(180deg, hsl(0, 0%, 95%) 0%, hsl(0, 0%, 60%) 50%, hsl(0, 0%, 85%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .bg-metallic {
+    background: linear-gradient(145deg, hsl(0, 0%, 85%), hsl(0, 0%, 50%), hsl(0, 0%, 75%));
   }
   
   .glow-primary {
@@ -98,21 +117,27 @@ All colors MUST be HSL.
   }
   
   .card-gradient {
-    background: linear-gradient(135deg, hsl(0, 0%, 8%), hsl(0, 0%, 12%));
-    border: 1px solid hsl(0, 0%, 20%);
+    background: linear-gradient(135deg, hsl(240, 10%, 10%), hsl(240, 10%, 14%));
+    border: 1px solid hsl(0, 0%, 25%);
   }
   
   .card-glass {
-    background: linear-gradient(135deg, hsl(0, 0%, 10% / 0.7), hsl(0, 0%, 8% / 0.5));
+    background: linear-gradient(135deg, hsl(240, 10%, 12% / 0.8), hsl(240, 10%, 8% / 0.6));
     backdrop-filter: blur(10px);
-    border: 1px solid hsl(0, 0%, 25% / 0.5);
+    border: 1px solid hsl(0, 0%, 30% / 0.5);
     box-shadow: var(--shadow-glass);
   }
   
   .card-elevated {
-    background: linear-gradient(135deg, hsl(0, 0%, 10%), hsl(0, 0%, 8%));
-    border: 1px solid hsl(0, 0%, 25%);
+    background: linear-gradient(135deg, hsl(240, 10%, 12%), hsl(240, 10%, 8%));
+    border: 1px solid hsl(0, 0%, 30%);
     box-shadow: var(--shadow-elevated);
+  }
+  
+  .card-chrome {
+    background: linear-gradient(145deg, hsl(240, 10%, 15%), hsl(240, 10%, 8%));
+    border: 1px solid hsl(0, 0%, 35%);
+    box-shadow: var(--shadow-chrome);
   }
   
   .bg-mesh {
@@ -143,12 +168,25 @@ All colors MUST be HSL.
     }
   }
   
+  @keyframes rotate-slow {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
   
   .animate-pulse-glow {
     animation: pulse-glow 3s ease-in-out infinite;
+  }
+  
+  .animate-rotate-slow {
+    animation: rotate-slow 20s linear infinite;
   }
 }
 

@@ -26,8 +26,8 @@ const GalaxyParticles = () => {
     const colors = new Float32Array(particleCount * 3);
     const sizes = new Float32Array(particleCount);
 
-    // Text "TECHSPHERE" as morph target
-    const text = "TECHSPHERE";
+    // Text "TECH SPHERE" as morph target
+    const text = "TECH SPHERE";
     const gridCols = 60;
     const gridRows = 10;
     const spacing = 0.15;
@@ -43,7 +43,7 @@ const GalaxyParticles = () => {
       positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       positions[i * 3 + 2] = radius * Math.cos(phi) - 2;
 
-      // Target positions forming "TECHSPHERE" text grid
+      // Target positions forming "TECH SPHERE" text grid
       const textIdx = Math.floor((i / particleCount) * text.length);
       const char = text[textIdx] || ' ';
       const charOffset = textIdx * 3;
@@ -58,13 +58,13 @@ const GalaxyParticles = () => {
       targetPositions[i * 3 + 1] = (row - gridRows / 2) * spacing + (Math.random() - 0.5) * 0.2;
       targetPositions[i * 3 + 2] = inLetter ? 0 : -5;
 
-      // Color palette - galaxy to accent
+      // Metallic silver/chrome color palette
       const colorPalette = [
-        new THREE.Color('#6EE7F9'),
-        new THREE.Color('#64B5FF'),
-        new THREE.Color('#A8FFED'),
-        new THREE.Color('#FFD6A5'),
         new THREE.Color('#FFFFFF'),
+        new THREE.Color('#E8E8E8'),
+        new THREE.Color('#C0C0C0'),
+        new THREE.Color('#A0A0A0'),
+        new THREE.Color('#D4D4D4'),
       ];
       const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
       colors[i * 3] = color.r;
@@ -240,7 +240,7 @@ const GalaxyMorphBackground = () => {
   if (prefersReducedMotion) {
     return (
       <div className="absolute inset-0 flex items-center justify-center">
-        <h1 className="text-6xl font-bold text-gradient-shine">TECHSPHERE</h1>
+        <h1 className="text-6xl font-bold text-metallic">TECH SPHERE</h1>
       </div>
     );
   }

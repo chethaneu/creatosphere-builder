@@ -66,17 +66,17 @@ const Contact = () => {
   return (
     <section id="contact" className="py-24 bg-background relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px]"></div>
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]"></div>
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-foreground/5 rounded-full blur-[120px]"></div>
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-foreground/5 rounded-full blur-[120px]"></div>
       
       <div className="container mx-auto px-4 max-w-3xl relative z-10">
         <div className="text-center mb-12 animate-fade-in">
           <div className="inline-block mb-4">
-            <span className="px-4 py-2 rounded-full bg-accent/10 border border-accent/30 text-accent text-sm font-semibold">
+            <span className="px-4 py-2 rounded-full bg-muted border border-border text-foreground text-sm font-semibold uppercase tracking-wider">
               Get In Touch
             </span>
           </div>
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-gradient">
+          <h2 className="text-5xl md:text-6xl font-bold mb-6 text-metallic">
             Contact Me
           </h2>
           <p className="text-xl text-muted-foreground font-light">
@@ -84,7 +84,7 @@ const Contact = () => {
           </p>
         </div>
         
-        <Card className="card-glass animate-fade-in border-border/50 hover:card-elevated transition-all duration-500">
+        <Card className="card-chrome animate-fade-in hover:shadow-lg transition-all duration-500">
           <CardHeader className="text-center pb-4">
           </CardHeader>
           
@@ -131,7 +131,7 @@ const Contact = () => {
               <Button 
                 type="submit" 
                 size="lg"
-                className="w-full bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] hover:bg-right text-primary-foreground font-bold text-lg glow-primary-lg hover:glow-accent-lg transition-all duration-500 hover:scale-105 group"
+                className="w-full bg-metallic text-primary-foreground font-bold text-lg uppercase tracking-wider glow-primary-lg hover:glow-accent-lg transition-all duration-500 hover:scale-105 group"
               >
                 <Send className="w-5 h-5 mr-2 transition-transform group-hover:translate-x-1" />
                 Send Message
