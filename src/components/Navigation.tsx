@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,7 +34,7 @@ const Navigation = () => {
     <nav 
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         isScrolled 
-          ? "bg-background/80 backdrop-blur-xl border-b border-border/50 shadow-lg shadow-primary/5" 
+          ? "bg-background/90 backdrop-blur-xl border-b border-border/50 shadow-lg" 
           : "bg-transparent"
       }`}
     >
@@ -41,12 +42,9 @@ const Navigation = () => {
         <div className="flex items-center justify-between h-20">
           <button 
             onClick={() => scrollToSection("#hero")}
-            className="text-2xl font-bold text-gradient-shine hover:scale-105 transition-all duration-300 flex items-center gap-2"
+            className="flex items-center gap-3 hover:scale-105 transition-all duration-300"
           >
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-              <span className="text-white text-sm font-bold">T</span>
-            </div>
-            TechSphere
+            <img src={logo} alt="Tech Sphere" className="h-12 w-auto" />
           </button>
           
           {/* Desktop Navigation */}
@@ -55,15 +53,15 @@ const Navigation = () => {
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
-                className="text-muted-foreground hover:text-foreground transition-all duration-300 font-medium relative group"
+                className="text-muted-foreground hover:text-foreground transition-all duration-300 font-medium relative group uppercase tracking-wider text-sm"
               >
                 {link.label}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary group-hover:w-full transition-all duration-300"></span>
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300"></span>
               </button>
             ))}
             <Button 
               onClick={() => scrollToSection("#request-form")}
-              className="bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_100%] hover:bg-right text-primary-foreground font-bold transition-all duration-500 glow-primary hover:glow-accent-lg hover:scale-105"
+              className="bg-metallic text-primary-foreground font-bold transition-all duration-500 glow-primary hover:glow-primary-lg hover:scale-105 uppercase tracking-wider"
             >
               Get Started
             </Button>
@@ -85,14 +83,14 @@ const Navigation = () => {
               <button
                 key={link.href}
                 onClick={() => scrollToSection(link.href)}
-                className="block w-full text-left py-3 text-muted-foreground hover:text-primary transition-colors"
+                className="block w-full text-left py-3 text-muted-foreground hover:text-foreground transition-colors uppercase tracking-wider text-sm"
               >
                 {link.label}
               </button>
             ))}
             <Button 
               onClick={() => scrollToSection("#request-form")}
-              className="w-full mt-4 bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-primary-foreground font-medium"
+              className="w-full mt-4 bg-metallic text-primary-foreground font-bold uppercase tracking-wider"
             >
               Get Started
             </Button>
